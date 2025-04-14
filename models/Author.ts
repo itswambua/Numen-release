@@ -1,4 +1,4 @@
-// models/author.ts
+// models/Author.ts
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IAuthor extends Document {
@@ -12,8 +12,8 @@ export interface IAuthor extends Document {
     linkedin?: string;
     x?: string;
   };
-  quoteHighlight?: string;           // 🟦 Featured quote (italic block)
-  creativeProcess?: string;         // 🟦 Narrative section: "The Creative Process"
+  quoteHighlight?: string;
+  creativeProcess?: string;
   latestWork?: string;
   upcomingProjects?: {
     title: string;
@@ -32,14 +32,8 @@ const AuthorSchema = new Schema<IAuthor>({
     linkedin: String,
     x: String
   },
-  quoteHighlight: {
-    type: String,
-    default: ''
-  },
-  creativeProcess: {
-    type: String,
-    default: ''
-  },
+  quoteHighlight: { type: String, default: '' },
+  creativeProcess: { type: String, default: '' },
   latestWork: String,
   upcomingProjects: [{
     title: { type: String, required: true },

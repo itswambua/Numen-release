@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
+import { IAuthor } from './Author'; // Import IAuthor interface
 
 interface IFormat {
   type: 'hardcover' | 'paperback' | 'ebook' | 'audiobook';
@@ -6,15 +7,16 @@ interface IFormat {
 }
 
 interface IFeature {
-  icon: string; // storing SVG path or a named identifier for dynamic rendering
+  icon: string;
   title: string;
   description: string;
+  iconClassName?: string;  // Optional field for storing the icon class name
 }
 
 export interface IBook extends Document {
   title: string;
   slug: string;
-  authorId?: Types.ObjectId;
+  authorId: IAuthor;  // Type directly as IAuthor
   synopsis?: string;
   chapterPreview?: string;
   coverImageUrl?: string;
@@ -26,7 +28,7 @@ const BookSchema = new Schema<IBook>(
   {
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
-    authorId: { type: Schema.Types.ObjectId, ref: 'Author' },
+    authorId: { type: Schema.Types.ObjectId, ref: 'Author', required: true },
     synopsis: String,
     chapterPreview: String,
     coverImageUrl: String,
@@ -42,9 +44,10 @@ const BookSchema = new Schema<IBook>(
     ],
     features: [
       {
-        icon: { type: String, required: true }, // Can be a keyword like "book", "shield", etc.
+        icon: { type: String, required: true },
         title: { type: String, required: true },
         description: { type: String, required: true },
+        iconClassName: { type: String }, // Add iconClassName to store the class name for the icon
       },
     ],
   },

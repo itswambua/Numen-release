@@ -1,40 +1,31 @@
-"use client";
+import { IFeature } from '@/types/features'; // Import the IFeature interface
+// import { BookIcon, UsersIcon, GlobeIcon, HeartIcon } from '@heroicons/react/outline'; // Import from outline for the icons
 
-import { useEffect, useState } from "react";
-import { iconMap } from "@/lib/iconMap";
-
-interface Feature {
-  icon: string;
-  title: string;
-  description: string;
+interface BookFeaturesProps {
+  features: IFeature[];  // Define the 'features' prop type
 }
 
-export default function BookFeatures() {
-  const [features, setFeatures] = useState<Feature[]>([]);
-
-  useEffect(() => {
-    const fetchFeatures = async () => {
-      try {
-        const res = await fetch("/api/book/the-numen-of-banda"); // 👈 Or your book fetching API
-        const data = await res.json();
-        setFeatures(data.book.features || []);
-      } catch (err) {
-        console.error("Failed to load features:", err);
-      }
-    };
-
-    fetchFeatures();
-  }, []);
+export default function BookFeatures({ features }: BookFeaturesProps) {
+  if (!features || features.length === 0) {
+    return <div>No features available.</div>;
+  }
 
   return (
     <section className="py-16 bg-sky/30">
       <div className="container mx-auto px-6">
-        <h2 className="text-3xl font-bold text-center mb-12 text-deep-brown">What Makes This Book Special</h2>
+        <h2 className="text-3xl font-bold text-center mb-12 text-deep-brown">
+          What Makes This Book Special
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <div key={index} className="bg-gradient-to-b from-white/60 to-sky/20 rounded-xl shadow-md p-8 hover:shadow-lg transition-all duration-500 backdrop-blur-sm border border-mountain/10">
               <div className="text-forest mb-4">
-                {iconMap[feature.icon] || <span>🎯</span>}
+
+                {/* here create a conditional block to render each of the unused class depending on icon.name match _ you can create an array to enable matching  */}
+                {/* Render icon using the passed class name */}
+                {/* <svg className={feature.iconClassName} fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path>
+                </svg> */}
               </div>
               <h3 className="text-xl font-semibold mb-3 text-deep-brown">{feature.title}</h3>
               <p className="text-mountain-dark">{feature.description}</p>
