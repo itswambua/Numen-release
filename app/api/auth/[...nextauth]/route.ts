@@ -1,35 +1,29 @@
-
-import NextAuth from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import { connectToDB } from '@/lib/db'; // You'll need to create this
-import { User } from '@/models/User'; // You'll need to create this
+import { connectToDB } from '@/lib/db';
+import { User } from '@/models/User';
+import { NextRequest } from 'next/server';
 
-const handler = NextAuth({
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+        if (!credentials?.email || !credentials?.password) return null;
 
         try {
           await connectToDB();
-          
+
           const user = await User.findOne({ email: credentials.email });
-          if (!user) {
-            return null;
-          }
-          
+          if (!user) return null;
+
           const passwordMatch = await bcrypt.compare(credentials.password, user.password);
-          if (!passwordMatch) {
-            return null;
-          }
+          if (!passwordMatch) return null;
 
           return {
             id: user._id.toString(),
@@ -37,25 +31,21 @@ const handler = NextAuth({
             email: user.email,
           };
         } catch (error) {
-          console.error("Auth Error:", error);
+          console.error('Auth Error:', error);
           return null;
         }
-      }
-    })
+      },
+    }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
+      if (user) token.id = user.id;
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id;
-      }
+      if (token) session.user.id = token.id;
       return session;
-    }
+    },
   },
   session: {
     strategy: 'jwt',
@@ -65,6 +55,9 @@ const handler = NextAuth({
     error: '/login',
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
 
-export { handler as GET, handler as POST };
+const handler = NextAuth(authOptions);
+
+export const GET = (req: NextRequest) => handler(req);
+export const POST = (req: NextRequest) => handler(req);
