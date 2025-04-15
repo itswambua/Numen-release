@@ -13,21 +13,27 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
-
-        await connectToDB();
-        const user = await User.findOne({ email: credentials.email });
-        if (!user) return null;
-
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) return null;
-
-        return {
-          id: user._id.toString(),
-          name: user.name,
-          email: user.email,
-        };
+        try {
+          if (!credentials?.email || !credentials?.password) return null;
+      
+          await connectToDB();
+          const user = await User.findOne({ email: credentials.email });
+          if (!user) return null;
+      
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+          if (!isValid) return null;
+      
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+          };
+        } catch (error) {
+          console.error('[NEXTAUTH_AUTHORIZE_ERROR]', error);
+          return null;
+        }
       }
+      
     })
   ],
   callbacks: {
