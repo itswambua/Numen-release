@@ -3,7 +3,7 @@ import Image from "next/image";
 import { getBooks } from '@/lib/actions/getBooks';
 import { Review } from '@/models/Review';
 
-// export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 
 export default async function BookPage() {
   const books = await getBooks();
