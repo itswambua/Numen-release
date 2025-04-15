@@ -1,6 +1,8 @@
 // app/layout.tsx
 
 import React from 'react';
+import type { ReactNode } from 'react';
+
 import { Inter, Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -28,13 +30,13 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
   const contactEmail = "info@numenofbanda.com";
   
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: {children:ReactNode}) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${inter.className} antialiased text-deep-brown`}>
         <AuthProvider>
-        <SpeedInsights>
-          <Navbar />
+        <SpeedInsights />
+        <Navbar />
           <main>{children}</main>
                 <Footer 
                       quickLinks={quickLinks} 
@@ -42,7 +44,6 @@ export default function RootLayout({ children }) {
                       contactEmail={contactEmail} 
                     />
            
-        </SpeedInsights>
         </AuthProvider>
       </body>
     </html>
