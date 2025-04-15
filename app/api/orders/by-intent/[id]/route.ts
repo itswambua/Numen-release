@@ -1,14 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'; // Important!
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDB } from '@/lib/db';
 import { Order } from '@/models/Order';
 
 export async function GET(
-  req: NextRequest, // <- this must be NextRequest
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: { params: Record<string, string> } // <- fix this line
 ) {
+  const { id } = context.params;
+
   try {
     await connectToDB();
-    const order = await Order.findOne({ stripeIntentId: params.id }).lean();
+    const order = await Order.findOne({ stripeIntentId: id }).lean();
 
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
