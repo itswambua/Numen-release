@@ -1,9 +1,3 @@
-// import environment variables
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
-
-
-// lib/db.ts
 import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI || '';
@@ -22,7 +16,10 @@ export async function connectToDB(): Promise<typeof mongoose> {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, { bufferCommands: false });
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      bufferCommands: false,
+      dbName: 'numen-release', // 👈🏽 Force the right DB name
+    });
   }
 
   cached.conn = await cached.promise;
