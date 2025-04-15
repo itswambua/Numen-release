@@ -1,5 +1,7 @@
+// models/Book.ts
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
-import { IAuthor } from './Author'; // Import IAuthor interface
+// ❌ Remove this to avoid circular dependency issues
+// import { IAuthor } from './Author'; 
 
 interface IFormat {
   type: 'hardcover' | 'paperback' | 'ebook' | 'audiobook';
@@ -10,13 +12,13 @@ interface IFeature {
   icon: string;
   title: string;
   description: string;
-  iconClassName?: string;  // Optional field for storing the icon class name
+  iconClassName?: string;
 }
 
 export interface IBook extends Document {
   title: string;
   slug: string;
-  authorId: IAuthor;  // Type directly as IAuthor
+  authorId: Types.ObjectId | Record<string, any>; // ✅ compatible with populated docs
   synopsis?: string;
   chapterPreview?: string;
   coverImageUrl?: string;
@@ -47,11 +49,13 @@ const BookSchema = new Schema<IBook>(
         icon: { type: String, required: true },
         title: { type: String, required: true },
         description: { type: String, required: true },
-        iconClassName: { type: String }, // Add iconClassName to store the class name for the icon
+        iconClassName: { type: String },
       },
     ],
   },
   { timestamps: true }
 );
 
-export const Book: Model<IBook> = mongoose.models.Book || mongoose.model<IBook>('Book', BookSchema);
+// ✅ Model registration (singleton-safe)
+export const Book: Model<IBook> =
+  mongoose.models.Book || mongoose.model<IBook>('Book', BookSchema);

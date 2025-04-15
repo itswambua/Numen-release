@@ -1,62 +1,54 @@
 import { NextResponse } from 'next/server';
 import { connectToDB } from '@/lib/db';
+import '@/models/Author'; // ✅ Force-load to register the model only
+
 import { Book } from '@/models/Book';
-import { Author } from '@/models/Author';
 import type { NextRequest } from 'next/server';
-import mongoose from 'mongoose';
 
-export const dynamic = 'force-dynamic'; // disables static optimization
-
-interface BookWithAuthor extends mongoose.Document {
-  _id: string;
-  title: string;
-  slug: string;
-  synopsis?: string;
-  chapterPreview?: string;
-  coverImageUrl?: string;
-  formats: Array<{
-    type: string;
-    price: number;
-  }>;
-  features?: string[];
-  author?: {
-    name: string;
-    bio: string;
-    photoUrl?: string;
-    contactEmail?: string;
-    socialLinks?: {
-      twitter?: string;
-      instagram?: string;
-      website?: string;
-    };
-  } | null;
-}
+export const dynamic = 'force-dynamic'; // disable static optimization
 
 export async function GET(_req: NextRequest) {
   try {
     await connectToDB();
 
-    // 👇 to this, to ensure we work with plain objects
-    const books = await Book.find({}).lean();
+    // ✅ Populate author and lean all at once (fastest + single query)
+    const books = await Book.find({})
+      .populate({
+        path: 'authorId',
+        select: 'name bio photoUrl contactEmail socialLinks',
+      })
+      .lean();
 
-    const booksWithAuthor = await Promise.all(
-      books.map(async (book) => {
-        const author = await Author.findById(book.authorId).lean(); // also lean here!
+    // ✅ Transform output: flatten "authorId" into "author"
+    const booksWithAuthor = books.map((book) => {
+      const { authorId, ...rest } = book;
+
+      if (typeof authorId === 'object' && authorId !== null && 'name' in authorId) {
+        const {
+          name,
+          bio,
+          photoUrl,
+          contactEmail,
+          socialLinks,
+        } = authorId as any; // optionally cast to IAuthor if needed
 
         return {
-          ...book,
-          author: author
-            ? {
-              name: author.name,
-              bio: author.bio,
-              photoUrl: author.photoUrl,
-              contactEmail: author.contactEmail,
-              socialLinks: author.socialLinks,
-            }
-            : null,
+          ...rest,
+          author: {
+            name,
+            bio,
+            photoUrl,
+            contactEmail,
+            socialLinks,
+          },
         };
-      })
-    );
+      }
+
+      return {
+        ...rest,
+        author: null,
+      };
+    });
 
 
     return NextResponse.json(

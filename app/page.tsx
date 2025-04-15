@@ -9,12 +9,16 @@ import BookFeatures from '@/components/BookFeatures';  // Default import
 import FeaturedReviews from '@/components/FeaturedReviews';
 import AuthorSection from '@/components/AuthorSection';
 import Link from 'next/link';
+import { IReview } from '@/models/Review';
+
 import { IBook } from '@/models/Book';
+
 
 export default function Home() {
   const [book, setBook] = useState<IBook | null>(null);
   const [authorName, setAuthorName] = useState<string>('Unknown Author');
   const [features, setFeatures] = useState<IFeature[]>([]);
+  const [reviews, setReviews] = useState<IReview[]>([]);
   const [loading, setLoading] = useState<boolean>(true);  // State to handle loading
   const [error, setError] = useState<string | null>(null);  // State to handle errors
 
@@ -64,12 +68,22 @@ export default function Home() {
         });
 
         setFeatures(processedFeatures);  // Set processed features
+
+        // ✅ Fetch featured reviews
+        const reviewsRes = await fetch(`/api/reviews?book=${firstBook._id}`);
+        const reviewsJson = await reviewsRes.json();
+        const featuredReviews = reviewsJson.data?.filter((review: IReview) => review.rating >= 4) || [];
+        setReviews(featuredReviews);
+
+
         setLoading(false);  // Set loading to false after fetching is done
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to load book data');
         setLoading(false);  // Set loading to false on error
       }
+
+
     };
 
     fetchData();
@@ -112,7 +126,7 @@ export default function Home() {
 
       <BookFeatures features={features} />
 
-      <FeaturedReviews />
+      <FeaturedReviews reviews={reviews} />
       <AuthorSection />
 
       <section className="py-16 bg-sky text-deep-brown text-center">

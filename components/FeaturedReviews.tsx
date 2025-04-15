@@ -1,47 +1,19 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { OutlineButton } from "@/components/Button";
+import { IReview } from "@/models/Review"; // ✅ Import the correct type
 
-interface Review {
-  _id: string;
-  quote: string;
-  userName: string;
-  rating: number;
-  title?: string;
+interface Props {
+  reviews: IReview[];
 }
 
-export default function FeaturedReviews() {
-  const [reviews, setReviews] = useState<Review[]>([]);
+export default function FeaturedReviews({ reviews }: Props) {
   const [activeReview, setActiveReview] = useState(0);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/reviews`, { headers: { Accept: "application/json" } });
-        const data: Review[] = await res.json();
-        setReviews(data.filter((review) => review.rating >= 4)); // or add isFeatured in model
-      } catch (err) {
-        console.error("Failed to fetch reviews:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const nextReview = () => setActiveReview((prev) => (prev + 1) % reviews.length);
+  const prevReview = () => setActiveReview((prev) => (prev - 1 + reviews.length) % reviews.length);
 
-    fetchReviews();
-  }, []);
-
-  const nextReview = () => {
-    setActiveReview((prev) => (prev + 1) % reviews.length);
-  };
-
-  const prevReview = () => {
-    setActiveReview((prev) => (prev - 1 + reviews.length) % reviews.length);
-  };
-
-  if (loading) return null;
   if (!reviews.length) return <p className="text-center">No reviews available.</p>;
 
   const active = reviews[activeReview];
@@ -55,6 +27,7 @@ export default function FeaturedReviews() {
         </p>
 
         <div className="relative max-w-4xl mx-auto">
+          {/* Prev Button */}
           <button
             onClick={prevReview}
             className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:translate-x-0 bg-sky-light hover:bg-sky text-deep-brown w-10 h-10 rounded-full flex items-center justify-center shadow-lg z-10 border border-mountain/30"
@@ -65,6 +38,7 @@ export default function FeaturedReviews() {
             </svg>
           </button>
 
+          {/* Review Card */}
           <div className="bg-sky-light/80 rounded-lg p-8 md:p-12 shadow-lg border border-mountain/30">
             <div className="text-4xl text-rooster mb-6">❝</div>
             <p className="text-xl md:text-2xl italic mb-6 text-deep-brown">{active.quote}</p>
@@ -79,7 +53,7 @@ export default function FeaturedReviews() {
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l..." />
                     </svg>
                   ))}
                 </div>
@@ -90,6 +64,7 @@ export default function FeaturedReviews() {
             </div>
           </div>
 
+          {/* Next Button */}
           <button
             onClick={nextReview}
             className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-0 bg-sky-light hover:bg-sky text-deep-brown w-10 h-10 rounded-full flex items-center justify-center shadow-lg border border-mountain/30"
