@@ -1,15 +1,15 @@
+'use client'; 
 import Link from "next/link";
 import Image from "next/image";
-import { connectToDB } from "@/lib/db";
+import { getBooks } from '@/lib/actions/getBooks';
 import { Review } from '@/models/Review';
-import { Book } from '@/models/Book';
-export const dynamic = 'force-dynamic'; // 🧠 this disables static pre-render
 
+export const dynamic = 'force-dynamic';
 
 export default async function BookPage() {
-  await connectToDB();
+  const books = await getBooks();
+  const book = books.find((b: any) => b.slug === 'the-numen-of-banda');
 
-  const book = await Book.findOne({ slug: 'the-numen-of-banda' }).lean();
   const reviews = book
     ? await Review.find({ isFeatured: true, book: book._id }).limit(3).lean()
     : [];
@@ -21,7 +21,6 @@ export default async function BookPage() {
       </div>
     );
   }
-
   return (
     <div>
       {/* Hero Banner */}
