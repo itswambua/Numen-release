@@ -1,18 +1,60 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getBooks } from '@/lib/actions/getBooks';
-import { Review } from '@/models/Review';
 
 export const dynamic = 'force-dynamic';
 
-export default async function BookPage() {
-  const books = await getBooks();
-  console.log(books);
-  const book = books.find((b: any) => b.slug === 'the-numen-of-banda');
+interface Book {
+  _id: string;
+  title: string;
+  slug: string;
+  synopsis?: string;
+  chapterPreview?: string;
+  coverImageUrl?: string;
+  formats: Array<{ type: string; price: number }>;
+  features?: string[];
+  author?: {
+    name: string;
+    bio: string;
+    photoUrl?: string;
+    contactEmail?: string;
+    socialLinks?: Record<string, string>;
+  };
+}
 
-  const reviews = book
-    ? await Review.find({ isFeatured: true, book: book._id }).limit(3).lean()
-    : [];
+interface Review {
+  rating: number;
+  title: string;
+  quote: string;
+  userName: string;
+}
+
+async function getBookAndReviews(): Promise<{ book: Book | null; reviews: Review[] }> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/book`, {
+      cache: 'no-store',
+    });
+    const json = await res.json();
+    const book = json.data?.find((b: Book) => b.slug === 'the-numen-of-banda');
+
+    let reviews: Review[] = [];
+
+    if (book) {
+      const resRev = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/reviews?book=${book._id}`, {
+        cache: 'no-store',
+      });
+      const revData = await resRev.json();
+      reviews = revData?.data || [];
+    }
+
+    return { book, reviews };
+  } catch (err) {
+    console.error('[BOOK_PAGE_FETCH_ERROR]', err);
+    return { book: null, reviews: [] };
+  }
+}
+
+export default async function BookPage() {
+  const { book, reviews } = await getBookAndReviews();
 
   if (!book) {
     return (
@@ -42,6 +84,7 @@ export default async function BookPage() {
                   alt={`${book.title} by Hillan K. Nzioka`}
                   fill
                   priority
+                  sizes="50"
                   className="object-cover"
                 />
               </div>

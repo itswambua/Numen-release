@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
+
 export default function AboutPage() {
   return (
     <div>
+
       {/* Hero Banner */}
       <div className="bg-mountain-pattern py-12">
         <div className="container mx-auto px-6 relative z-10">

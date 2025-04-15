@@ -4,16 +4,24 @@ import { connectToDB } from '@/lib/db';
 import { Review } from '@/models/Review';
 import { Book } from '@/models/Book'; // ⬅ import the Book model
 
-
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     await connectToDB();
-    const reviews = await Review.find().sort({ createdAt: -1 });
-    return NextResponse.json(reviews);
+
+    const bookId = req.nextUrl.searchParams.get('book');
+    const query = bookId ? { book: bookId } : {};
+
+    const reviews = await Review.find(query)
+      .sort({ createdAt: -1 }) // Newest first
+      .limit(3); // ✅ Limit to the 3 most recent reviews
+
+    return NextResponse.json({ success: true, data: reviews });
   } catch (err) {
+    console.error('[REVIEWS_FETCH_ERROR]', err);
     return new NextResponse('Failed to fetch reviews', { status: 500 });
   }
 }
+
 
 export async function POST(req: NextRequest) {
         try {

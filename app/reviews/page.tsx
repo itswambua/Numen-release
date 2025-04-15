@@ -28,9 +28,9 @@ export default function ReviewsPage() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await fetch('/api/reviews');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/reviews`);
         const data = await res.json();
-        setReviews(data);            // ✅ this is now in scope
+        setReviews(data.data || []);
       } catch (err) {
         console.error('Failed to load reviews:', err);
       } finally {
@@ -44,6 +44,7 @@ export default function ReviewsPage() {
 
   return (
     <div className="bg-sky/10 min-h-screen">
+      
       {/* Hero Banner */}
       <div className="bg-mountain-pattern py-12">
         <div className="container mx-auto px-6 relative z-10 text-center">
@@ -104,7 +105,9 @@ export default function ReviewsPage() {
                     </div>
                   </div>
                   <div className="ml-auto text-right">
-                    <p className="text-xs text-mountain italic">{new Date(review.createdAt).toLocaleDateString()}</p>
+                  <p className="text-xs text-mountain italic">
+  {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(review.createdAt))}
+</p>
                   </div>
                 </div>
 

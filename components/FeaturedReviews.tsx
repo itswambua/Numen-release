@@ -20,7 +20,7 @@ export default function FeaturedReviews() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await fetch("/api/reviews", { headers: { Accept: "application/json" } });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/reviews`, { headers: { Accept: "application/json" } });
         const data: Review[] = await res.json();
         setReviews(data.filter((review) => review.rating >= 4)); // or add isFeatured in model
       } catch (err) {
