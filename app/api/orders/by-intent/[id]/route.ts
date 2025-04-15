@@ -4,9 +4,9 @@ import { Order } from '@/models/Order';
 
 export async function GET(
   req: NextRequest,
-  context: { params: Record<string, string> } // <- fix this line
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = context.params;
+  const { id } = await params;
 
   try {
     await connectToDB();
