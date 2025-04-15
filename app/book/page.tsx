@@ -3,6 +3,8 @@ import Image from "next/image";
 import { connectToDB } from "@/lib/db";
 import { Review } from '@/models/Review';
 import { Book } from '@/models/Book';
+export const dynamic = 'force-dynamic'; // 🧠 this disables static pre-render
+
 
 export default async function BookPage() {
   await connectToDB();
