@@ -1,4 +1,3 @@
-'use client'; 
 import Link from "next/link";
 import Image from "next/image";
 import { getBooks } from '@/lib/actions/getBooks';
@@ -53,13 +52,14 @@ export default async function BookPage() {
                 <div className="card-secondary">
                   <h3 className="font-semibold text-deep-brown mb-2">Available Formats:</h3>
                   <ul className="space-y-1 text-mountain-dark">
-                    {book.formats.map((format: any, index: number) => (
-                      <li key={index} className="flex justify-between">
-                        <span>{format.type.charAt(0).toUpperCase() + format.type.slice(1)}</span>
-                        <span>USD ${format.price.toFixed(2)}</span>
-                      </li>
-                    ))}
-                  </ul>
+  {(book.formats || []).map((format: any, index: number) => (
+    <li key={index} className="flex justify-between">
+      <span>{format?.type?.charAt(0).toUpperCase() + format?.type?.slice(1)}</span>
+      <span>USD ${format?.price?.toFixed(2) || '0.00'}</span>
+    </li>
+  ))}
+</ul>
+
                 </div>
               </div>
             </div>
@@ -128,8 +128,8 @@ export default async function BookPage() {
             {reviews.map((review: any, i: number) => (
               <div key={i} className="card-secondary">
                 <div className="flex mb-4">
-                  {[...Array(review.rating)].map((_, j) => (
-                    <svg key={j} className="h-5 w-5 text-rooster" viewBox="0 0 20 20" fill="currentColor">
+                {Array.from({ length: review.rating }).map((_, j) => (
+  <svg key={j} className="h-5 w-5 text-rooster" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l..." />
                     </svg>
                   ))}
