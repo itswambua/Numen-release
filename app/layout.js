@@ -3,6 +3,7 @@
 import React from 'react';
 import { Inter, Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from '@/components/auth/AuthProvider';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 import Footer from '@/components/Footer';
 import Navbar from "@/components/Navbar";
@@ -32,6 +33,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${inter.className} antialiased text-deep-brown`}>
         <AuthProvider>
+        <SpeedInsights>
           <Navbar />
           <main>{children}</main>
                 <Footer 
@@ -40,7 +42,7 @@ export default function RootLayout({ children }) {
                       contactEmail={contactEmail} 
                     />
            
-
+        </SpeedInsights>
         </AuthProvider>
       </body>
     </html>
