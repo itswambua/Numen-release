@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 const appearance = { theme: 'stripe' as const }; // ✅ correct type
 
-interface OrderItem {
+export interface OrderItem {
   productId: string;
   title: string;
   quantity: number;
@@ -23,7 +23,7 @@ interface OrderItem {
   format: string;
 }
 
-interface ShippingDetails {
+export interface ShippingDetails {
   address: string;
   city: string;
   state: string;
@@ -31,13 +31,12 @@ interface ShippingDetails {
   country: string;
 }
 
-interface Props {
+export interface Props {
   cart: OrderItem[];
   isGuest: boolean;
-  guestInfo?: { name: string; email: string };
+  guestInfo?: { name: string; email: string }; // ✅ undefined, not null
   shippingDetails: ShippingDetails;
-  validateShippingInfo?: () => boolean; // ✅ NEW
-
+  validateShippingInfo?: () => boolean;
 }
 
 export default function StripeUnifiedCheckout(props: Props) {
@@ -63,7 +62,6 @@ export default function StripeUnifiedCheckout(props: Props) {
     createPaymentIntent();
   }, [props.cart, props.isGuest, props.guestInfo, props.shippingDetails]);
 
-  const appearance = { theme: 'stripe' };
 
   if (!clientSecret) {
     return <p className="text-sm text-deep-brown mt-6">Loading payment form...</p>;
