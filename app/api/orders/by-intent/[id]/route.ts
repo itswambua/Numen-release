@@ -1,11 +1,9 @@
-// This is the route the confirmation page will use.
-
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'; // Important!
 import { connectToDB } from '@/lib/db';
 import { Order } from '@/models/Order';
 
 export async function GET(
-  req: Request,
+  req: NextRequest, // <- this must be NextRequest
   { params }: { params: { id: string } }
 ) {
   try {
